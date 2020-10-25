@@ -5,16 +5,19 @@ namespace Whitecube\NovaPage\Pages;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Panel;
+use Whitecube\NovaFlexibleContent\Traits\AvailableFields;
 
 class PageResource extends StaticResource
 {
+
+    use AvailableFields;
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
     public static $model = 'nova-page';
-
+    public static $trafficCop = false;
     /**
      * Get the URI key for the resource.
      *

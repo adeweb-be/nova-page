@@ -3,7 +3,7 @@
 namespace Whitecube\NovaPage\Sources;
 
 use Carbon\Carbon;
-use Illuminate\Filesystem\Filesystem AS BaseFilesystem;
+use Illuminate\Filesystem\Filesystem as BaseFilesystem;
 use Whitecube\NovaPage\Pages\Template;
 
 class Filesystem implements SourceInterface
@@ -46,7 +46,7 @@ class Filesystem implements SourceInterface
      */
     public function fetch(Template $template)
     {
-        if(!($path = realpath($this->getOriginal($template)))) {
+        if (!($path = realpath($this->getOriginal($template)))) {
             return;
         }
 
@@ -63,12 +63,17 @@ class Filesystem implements SourceInterface
     {
         $data = [];
         $data['title'] = $template->getTitle();
-        $data['created_at'] = $template->getdate('created_at')->toDateTimeString();
-        $data['updated_at'] = Carbon::now()->toDateTimeString();
+        if ($template->timestamps) {
+            $data['created_at'] = $template->getdate('created_at')->toDateTimeString();
+            $data['updated_at'] = Carbon::now()->toDateTimeString();
+        } elseif ($template->getDate('created_at') != null && $template->getDate('updated_at') != null) {
+            $data['created_at'] = $template->getDate('created_at');
+            $data['updated_at'] = $template->getDate('updated_at');
+        }
         $data['attributes'] = $template->getAttributes();
 
         $path = $this->getOriginal($template);
-        
+
         $this->makeDirectory($path);
 
         return file_put_contents($path, json_encode($data, JSON_PRETTY_PRINT, 512));
@@ -112,7 +117,7 @@ class Filesystem implements SourceInterface
     {
         $files = resolve(BaseFilesystem::class);
 
-        if(!$files->isDirectory(dirname($path))) {
+        if (!$files->isDirectory(dirname($path))) {
             $files->makeDirectory(dirname($path), 0755, true, true);
         }
     }
@@ -146,8 +151,8 @@ class Filesystem implements SourceInterface
     protected function getParsedAttributes(Template $template, $attributes)
     {
         foreach ($attributes as $key => $value) {
-            if(!is_array($value) && !is_object($value)) continue;
-            if($template->isJsonAttribute($key)) continue;
+            if (!is_array($value) && !is_object($value)) continue;
+            if ($template->isJsonAttribute($key)) continue;
             $attributes[$key] = json_encode($value);
         }
 

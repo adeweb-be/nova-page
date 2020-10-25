@@ -47,6 +47,13 @@ abstract class Template implements ArrayAccess
     protected $title;
 
     /**
+     * Indicates if the page should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = true;
+
+    /**
      * The page's timestamps
      *
      * @var array
